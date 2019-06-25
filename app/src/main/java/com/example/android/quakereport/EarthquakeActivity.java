@@ -32,15 +32,12 @@ public class EarthquakeActivity extends AppCompatActivity {
         setContentView(R.layout.earthquake_activity);
 
 
-        ArrayList<Earthquake> Earthquakes = new ArrayList<>();
-        Earthquakes.add(new Earthquake("7.2","Durgapur , India","June 25, 2019"));
-        Earthquakes.add(new Earthquake("2.4","Kolkata , West Bengal , India","June 26, 2016"));
-        Earthquakes.add(new Earthquake("8.2","New York","June 25, 2027"));
+        ArrayList<Earthquake> earthquakes = QueryUtils.extractEarthquakes();
 
 
         ListView earthquakeListView = (ListView) findViewById(R.id.list);
 
-        ListAdapter adapter = new ListAdapter(this,Earthquakes);
+        ListAdapter adapter = new ListAdapter(this,earthquakes);
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface

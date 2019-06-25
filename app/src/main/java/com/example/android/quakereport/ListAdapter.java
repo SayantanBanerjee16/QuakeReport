@@ -35,10 +35,12 @@ public class ListAdapter extends ArrayAdapter<Earthquake> {
         TextView magnitude = (TextView) listItemView.findViewById(R.id.magnitude);
         TextView location = (TextView) listItemView.findViewById(R.id.place);
         TextView date = (TextView) listItemView.findViewById(R.id.date);
+        TextView time = (TextView) listItemView.findViewById(R.id.time);
 
         magnitude.setText(currentEarthquake.getMagnitude());
         location.setText(currentEarthquake.getLocation());
         date.setText(currentEarthquake.getDate());
+        time.setText(currentEarthquake.getTime());
 
 
         return listItemView;

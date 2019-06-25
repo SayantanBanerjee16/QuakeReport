@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
 
@@ -11,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="6.3"
-        android:textSize="20sp"
+        android:textSize="15sp"
         android:layout_margin="5dp"/>
 
     <TextView
@@ -20,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="San Fransisco"
-        android:textSize="20sp"
+        android:textSize="15sp"
         android:gravity="center_vertical"
         android:layout_margin="5dp"/>
 
@@ -29,7 +31,14 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Feb 2, 2016"
-        android:textSize="20sp"
-        android:layout_margin="5dp"/>
+        android:textSize="15sp"
+        android:text="Jan 12, 2016" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="15sp"
+        android:text="3:00 PM"/>
 </LinearLayout>
