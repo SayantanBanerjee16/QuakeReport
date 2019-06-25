@@ -16,6 +16,8 @@ import java.util.List;
 
 public class ListAdapter extends ArrayAdapter<Earthquake> {
 
+    private static final String LOCATION_SEPARATOR = " of ";
+
     public ListAdapter(Context context , List<Earthquake> earthquakes){
         super(context,0 , earthquakes);
     }
@@ -23,6 +25,11 @@ public class ListAdapter extends ArrayAdapter<Earthquake> {
 
     @Override
     public View getView(int position, View convertView,  ViewGroup parent) {
+
+        String primaryLocation;
+        String locationOffset;
+
+
 
         View listItemView = convertView;
         if(listItemView == null)
@@ -33,14 +40,27 @@ public class ListAdapter extends ArrayAdapter<Earthquake> {
         Earthquake currentEarthquake = getItem(position);
 
         TextView magnitude = (TextView) listItemView.findViewById(R.id.magnitude);
-        TextView location = (TextView) listItemView.findViewById(R.id.place);
         TextView date = (TextView) listItemView.findViewById(R.id.date);
         TextView time = (TextView) listItemView.findViewById(R.id.time);
 
         magnitude.setText(currentEarthquake.getMagnitude());
-        location.setText(currentEarthquake.getLocation());
         date.setText(currentEarthquake.getDate());
         time.setText(currentEarthquake.getTime());
+
+        if (currentEarthquake.getLocation().contains(LOCATION_SEPARATOR)) {
+            String[] parts = currentEarthquake.getLocation().split(LOCATION_SEPARATOR);
+            locationOffset = parts[0] + LOCATION_SEPARATOR;
+            primaryLocation = parts[1];
+        } else {
+            locationOffset = getContext().getString(R.string.near_the);
+            primaryLocation = currentEarthquake.getLocation();
+        }
+
+        TextView primaryLocationView = (TextView) listItemView.findViewById(R.id.primary_location);
+        primaryLocationView.setText(primaryLocation);
+
+        TextView locationOffsetView = (TextView) listItemView.findViewById(R.id.offset_location);
+        locationOffsetView.setText(locationOffset);
 
 
         return listItemView;
