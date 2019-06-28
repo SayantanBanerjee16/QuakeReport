@@ -19,91 +19,89 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.app.LoaderManager;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Loader;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EarthquakeActivity extends AppCompatActivity {
+public class EarthquakeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Earthquake>> {
     List<Earthquake> earthquakes;
+    View emptyView;
+    TextView emptyTextView;
 
     private static final String LOG_TAG = EarthquakeActivity.class.getName();
 
-    /**
-     * URL for earthquake data from the USGS dataset
-     */
+    private static final int EARTHQUAKE_LOADER_ID = 1;
+
     private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time&minmag=2&limit=50";
 
-    /**
-     * Adapter for the list of earthquakes
-     */
     private ListAdapter mAdapter;
 
-    private class EarthquakeAsyncTask extends AsyncTask<String, Void, List<Earthquake>> {
 
-        /**
-         * This method runs on a background thread and performs the network request.
-         * We should not update the UI from a background thread, so we return a list of
-         * {@link Earthquake}s as the result.
-         */
-        @Override
-        protected List<Earthquake> doInBackground(String... urls) {
-            // Don't perform the request if there are no URLs, or the first URL is null
-            if (urls.length < 1 || urls[0] == null) {
-                return null;
-            }
-
-            List<Earthquake> result = QueryUtils.fetchEarthquakeData(urls[0]);
-            return result;
-        }
-
-
-        @Override
-        protected void onPostExecute(List<Earthquake> data) {
-            // Clear the adapter of previous earthquake data
-            mAdapter.clear();
-            // If there is a valid list of {@link Earthquake}s, then add them to the adapter's
-            // data set. This will trigger the ListView to update.
-            if (data != null && !data.isEmpty()) {
-                mAdapter.addAll(data);
-            }
-        }
-
+    @Override
+    public Loader<List<Earthquake>> onCreateLoader(int i, Bundle bundle) {
+        return new EarthquakeLoader(this, USGS_REQUEST_URL);
     }
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.earthquake_activity);
+    @Override
+    public void onLoadFinished(Loader<List<Earthquake>> loader, List<Earthquake> earthquakes) {
+        mAdapter.clear();
+        emptyTextView.setText(R.string.no_earthquakes);
 
-            ListView earthquakeListView = (ListView) findViewById(R.id.list);
-
-            mAdapter = new ListAdapter(this, new ArrayList<Earthquake>());
-
-            earthquakeListView.setAdapter(mAdapter);
-
-            earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Earthquake currentEarthquake = mAdapter.getItem(position);
-                /* Other method by calling Implicit Intent (Website Intent)
-                Uri earthquakeUri = Uri.parse(currentEarthquake.getUrl());
-                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, earthquakeUri);
-                startActivity(websiteIntent); */
-
-                    Intent intent = new Intent(EarthquakeActivity.this, WebsiteActivity.class);
-                    intent.putExtra("url", currentEarthquake.getUrl());
-                    startActivity(intent);
-                }
-            });
-
-            EarthquakeAsyncTask task = new EarthquakeAsyncTask();
-            task.execute(USGS_REQUEST_URL);
-
-
+        if (earthquakes != null && !earthquakes.isEmpty()) {
+            mAdapter.addAll(earthquakes);
         }
     }
+
+    @Override
+    public void onLoaderReset(Loader<List<Earthquake>> loader){
+        mAdapter.clear();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.earthquake_activity);
+
+
+        ListView earthquakeListView = (ListView) findViewById(R.id.list);
+
+        emptyView = findViewById(R.id.emptyView);
+        emptyTextView = findViewById(R.id.emptyTextView);
+        earthquakeListView.setEmptyView(emptyView);
+
+        emptyTextView.setText("Loading...");
+
+
+        mAdapter = new ListAdapter(this, new ArrayList<Earthquake>());
+
+        earthquakeListView.setAdapter(mAdapter);
+
+        earthquakeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Earthquake currentEarthquake = mAdapter.getItem(position);
+
+                Intent intent = new Intent(EarthquakeActivity.this, WebsiteActivity.class);
+                intent.putExtra("url", currentEarthquake.getUrl());
+                startActivity(intent);
+            }
+        });
+
+
+        LoaderManager loaderManager = getLoaderManager();
+        loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+
+
+    }
+}
