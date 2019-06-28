@@ -15,12 +15,9 @@
  */
 package com.example.android.quakereport;
 
-import android.app.DownloadManager;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.UserHandle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,19 +25,24 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class EarthquakeActivity extends AppCompatActivity {
+    ArrayList<Earthquake> earthquakes;
 
-    ListView earthquakeListView;
+    public static final String LOG_TAG = EarthquakeActivity.class.getName();
 
-    private static final String USGS_REQUEST_URL =
-            "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time&minmag=6&limit=10";
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.earthquake_activity);
 
-    public void ArrayListFun(List<Earthquake> earthquakes2){
+
+        earthquakes = QueryUtils.extractEarthquakes();
 
 
-        final ListAdapter adapter = new ListAdapter(EarthquakeActivity.this,earthquakes2);
+        ListView earthquakeListView = (ListView) findViewById(R.id.list);
+
+        final ListAdapter adapter = new ListAdapter(this,earthquakes);
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
@@ -60,45 +62,9 @@ public class EarthquakeActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-    }
-
-    public static final String LOG_TAG = EarthquakeActivity.class.getName();
-
-    public class DownloadTask extends AsyncTask<String, Void , List<Earthquake>>{
-
-        @Override
-        protected List<Earthquake> doInBackground(String... strings) {
-            if (strings.length < 1 || strings[0] == null) {
-                return null;
-            }
-            List<Earthquake> earthquakes = QueryUtils.fetchEarthquakeData(strings[0]);
-            return earthquakes;
-        }
-
-        @Override
-        protected void onPostExecute(List<Earthquake> earthquakes) {
-            super.onPostExecute(earthquakes);
-//            if (earthquakes == null) {
-//                return;
-//            }
-            ArrayListFun(earthquakes);
-
-        }
-    }
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.earthquake_activity);
-        earthquakeListView =  (ListView) findViewById(R.id.list);
 
-        DownloadTask task = new DownloadTask();
-        try{
-            task.execute(USGS_REQUEST_URL);
-        }
-        catch (Exception e ){
-            e.printStackTrace();
-        }
+
     }
 }
