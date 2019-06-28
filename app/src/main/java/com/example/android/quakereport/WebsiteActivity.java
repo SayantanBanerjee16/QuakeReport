@@ -8,6 +8,12 @@ import android.webkit.WebViewClient;
 
 public class WebsiteActivity extends AppCompatActivity {
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        this.finish();
+    }
+
     WebView webview;
 
     @Override
