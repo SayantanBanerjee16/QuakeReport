@@ -24,11 +24,19 @@
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="300dp"
             android:id="@+id/emptyTextView"
             android:textSize="25sp"
             android:gravity="center"
             />
+        <ProgressBar
+            android:id="@+id/loading_indicator"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_below="@+id/emptyTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
     </RelativeLayout>
 
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -38,4 +46,5 @@
         android:divider="@null"
         android:dividerHeight="0dp"
         android:orientation="vertical" />
+
 </RelativeLayout>

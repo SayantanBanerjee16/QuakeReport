@@ -15,7 +15,10 @@
  */
 package com.example.android.quakereport;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -34,8 +37,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EarthquakeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Earthquake>> {
+public class EarthquakeActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Earthquake>>{
     List<Earthquake> earthquakes;
+
+    boolean isConnected;
+    View loadingIndicator;
     View emptyView;
     TextView emptyTextView;
 
@@ -43,19 +49,33 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
 
     private static final int EARTHQUAKE_LOADER_ID = 1;
 
-    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time&minmag=2&limit=50";
+    private static final String USGS_REQUEST_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&orderby=time&minmag=2.5&limit=50";
 
     private ListAdapter mAdapter;
 
 
     @Override
     public Loader<List<Earthquake>> onCreateLoader(int i, Bundle bundle) {
-        return new EarthquakeLoader(this, USGS_REQUEST_URL);
+        if(isConnected == true){
+            emptyTextView.setText("Loading...");
+            loadingIndicator.setVisibility(View.VISIBLE);
+            return new EarthquakeLoader(this, USGS_REQUEST_URL);
+        }
+        else
+        {
+            emptyTextView.setText("No Internet Connection.");
+            loadingIndicator.setVisibility(View.INVISIBLE);
+            return null;
+        }
+
     }
 
     @Override
     public void onLoadFinished(Loader<List<Earthquake>> loader, List<Earthquake> earthquakes) {
         mAdapter.clear();
+
+
+        loadingIndicator.setVisibility(View.GONE);
         emptyTextView.setText(R.string.no_earthquakes);
 
         if (earthquakes != null && !earthquakes.isEmpty()) {
@@ -79,8 +99,14 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
         emptyView = findViewById(R.id.emptyView);
         emptyTextView = findViewById(R.id.emptyTextView);
         earthquakeListView.setEmptyView(emptyView);
+        loadingIndicator = findViewById(R.id.loading_indicator);
 
-        emptyTextView.setText("Loading...");
+        ConnectivityManager cm =
+                (ConnectivityManager) getBaseContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+         isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
 
 
         mAdapter = new ListAdapter(this, new ArrayList<Earthquake>());
